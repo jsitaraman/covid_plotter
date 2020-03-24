@@ -86,7 +86,7 @@ colors=['k','r','m','c','y','g','b','r--','c--','k--','m--','g--','y--']
 # default is 2 months
 #
 days=60
-if (len(sys.argv) > 0):
+if (len(sys.argv) > 1):
     days=int(sys.argv[1])
 #
 # strip out only data per region
