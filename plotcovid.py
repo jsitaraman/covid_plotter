@@ -19,8 +19,8 @@ source3='https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_c
 # parse the JHU master data base
 #
 def getJHUData():
-  #os.system('rm *csv*;wget %s'%source1)
-  #os.system('wget %s'%source3)
+  os.system('rm *csv*;wget %s'%source1)
+  os.system('wget %s'%source3)
   data=open('time_series_covid19_confirmed_global.csv','r').readlines()
   dataUSA=open('time_series_covid19_confirmed_US.csv','r').readlines()
   #data=open('time_series_19-covid-Deaths.csv','r').readlines()  
@@ -33,8 +33,8 @@ def getJHUData():
 #
 def getSantaClaraData(datatab):
   import xml.etree.ElementTree as ET
-  #os.system('rm *.tab*')
-  #os.system('wget %s'%source2)
+  os.system('rm *.tab*')
+  os.system('wget %s'%source2)
   def getxml(data,node):
     if (len(node.getchildren())==0):
          data[0]+=node.text
@@ -84,7 +84,7 @@ if __name__== "__main__":
   # for. These strings need to be exact based on the
   # JHU data base
   #
-  regions=['US','Italy','India','France','Switzerland','California','Santa Clara','Quebec'] 
+  regions=['US','Italy','India','France','Switzerland','California','Santa Clara','Quebec','Washington','Michigan','New York'] 
   #regions=['Italy','California','Qatar','United Arab Emirates','Malaysia','Australia','India','New York','Illinois','Arizona','Maryland']
   #
   # TODO have to automatically sequence these colors
