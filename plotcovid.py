@@ -19,8 +19,8 @@ source3='https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_c
 # parse the JHU master data base
 #
 def getJHUData():
-  os.system('rm *csv*;wget %s'%source1)
-  os.system('wget %s'%source3)
+  os.system('rm *csv*;wget %s >& source1.log'%source1)
+  os.system('wget %s >& source2.log'%source3)
   data=open('time_series_covid19_confirmed_global.csv','r').readlines()
   dataUSA=open('time_series_covid19_confirmed_US.csv','r').readlines()
   #data=open('time_series_19-covid-Deaths.csv','r').readlines()  
@@ -33,8 +33,8 @@ def getJHUData():
 #
 def getSantaClaraData(datatab):
   import xml.etree.ElementTree as ET
-  os.system('rm *.tab*')
-  os.system('wget %s'%source2)
+  os.system('rm *.tab* > /dev/null 2>&1')
+  os.system('wget %s > /dev/null 2>&1'%source2)
   def getxml(data,node):
     if (len(node.getchildren())==0):
          data[0]+=node.text
@@ -71,6 +71,50 @@ def getSantaClaraData(datatab):
 if __name__== "__main__":
   #
   # main
+  #
+  regions=['US','Italy','India','France','Switzerland','California','Santa Clara','Quebec','Washington','New York']
+  #regions=['Italy','California','Qatar','United Arab Emirates','Malaysia','Australia','India','New York','Illinois','Arizona','Maryland']
+  #
+  # TODO have to automatically sequence these colors
+  #
+  colors=['k','r','m','c','y','g','b'] 
+  ncol=len(colors)
+  for c in colors[:ncol]:
+     colors.append(c+'o-')
+  for c in colors[:ncol]:
+     colors.append(c+'-.')
+  #
+  # number of days back from today to plot
+  # default is 2 months
+  #
+  days=60
+  avg_range=5
+  ratePlot=False
+  #
+  if len(sys.argv)==1:
+    print("Usage : python plotcovid.py --days=days --avg_range=avg_range --ratePlot=[True,False] --regions=<region1>,<region2>,<region3>..\n\n\n")
+    print("Output : test.pdf \n\n")
+    print("Using defaults now")
+    print("regions=",regions)
+    print("days=",days)
+    print("avg_range=\n\n",avg_range)
+    print("sources=%s\n%s\n",source1,source3)
+  else:  
+   # simple arg parser now
+   for arg in sys.argv:
+     if '--days' in arg:
+         days=int(arg.strip('--days='))
+     if '--ratePlot=True' in arg:
+         ratePlot=True
+     if '--avg_range' in arg:
+         avg_range=int(arg.strip('--avg_range='))
+     if '--regions=' in arg:
+         print arg
+         regions=[]
+         regions=arg[10:].split(',')
+         print regions
+  #
+  # main
   # read JHU data
   #
   ncountries,datatab=getJHUData()
@@ -84,26 +128,6 @@ if __name__== "__main__":
   # for. These strings need to be exact based on the
   # JHU data base
   #
-  regions=['US','Italy','India','France','Switzerland','California','Santa Clara','Quebec','Washington','Michigan','New York'] 
-  #regions=['Italy','California','Qatar','United Arab Emirates','Malaysia','Australia','India','New York','Illinois','Arizona','Maryland']
-  #
-  # TODO have to automatically sequence these colors
-  #
-  colors=['k','r','m','c','y','g','b','r--','c--','k--','m--','g--','y--']
-  #
-  # number of days back from today to plot
-  # default is 2 months
-  #
-  days=60
-  avg_range=5
-  ratePlot=False
-  if (len(sys.argv) > 1):
-    days=int(sys.argv[1])
-  if (len(sys.argv) > 2):
-    avg_range=int(sys.argv[2])
-  if (len(sys.argv) > 3):
-    if sys.argv[3]=='rate':
-      ratePlot=True
   #
   # strip out only data per region
   #
@@ -155,7 +179,7 @@ if __name__== "__main__":
   if ratePlot:
     for k in dtab.keys():
       if len(dtab[k])==0:
-         print "No data found for %s"%k
+         print( "No data found for %s"%k)
          continue
       x=np.arange(-avg_range,days)
       y=np.array([float(a) for a in dtab[k][-days-avg_range:]])
@@ -173,7 +197,7 @@ if __name__== "__main__":
   else:
     for k in dtab.keys():
       if len(dtab[k])==0:
-         print "No data found for %s"%k
+         print ("No data found for %s"%k)
          continue
       x=np.arange(0,days)
       y=np.array(dtab[k][-days:])
@@ -192,7 +216,7 @@ if __name__== "__main__":
   plt.xlim([0,days])
   box=ax.get_position()
   ax.set_position([box.x0,box.y0,box.width,box.height*1.2])
-  plt.legend(leg,fontsize=10,loc='upper center', bbox_to_anchor=(0.44, 1.30),ncol=3, fancybox=True, shadow=True)
+  plt.legend(leg,fontsize=8,loc='upper center', bbox_to_anchor=(0.44, 1.30),ncol=4, fancybox=True, shadow=True)
   if ratePlot:
     plt.ylabel('Growth Rate %')
     plt.ylim([0,100])
